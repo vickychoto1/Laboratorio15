@@ -1,0 +1,104 @@
+﻿@page "/"
+
+@using Models;
+@using Componentes;
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject NavigationManager NavigationManager
+
+<h1>Formulario para nuevos Alimentos</h1>
+
+<EditForm Model="@alimento" OnValidSubmit="@Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col col-2">
+                <label for="id" class="form-label">Código: </label>
+                <InputText id="identifier" class="form-control" @bind-Value="alimento.Id" />
+                <ValidationMessage For="() => alimento.Id" />
+            </div>
+            <div class="col col-4">
+                <label for="nombre" class="form-label">Nombre: </label>
+                <InputText id="identifier" class="form-control" @bind-Value="alimento.Nombre" />
+                <ValidationMessage For="() => alimento.Nombre" />
+            </div>
+            <div class="col col-6">
+                <label for="descripcion">Descripcion: </label>
+                <InputTextArea id="description" class="form-control" @bind-Value="alimento.Descripcion" />
+            </div>            
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <label for="precio">Precio de Compra: </label>
+                <InputNumber id="accommodation" class="form-control" @bind-Value="alimento.Precio" />
+                <ValidationMessage For="() => alimento.Precio" />
+            </div>
+            <div class="col">
+                <label for="precioVenta">Precio de Venta: </label>
+                <InputNumber id="precioventa" class="form-control" @bind-Value="alimento.PrecioVenta" />
+                <ValidationMessage For="() => alimento.PrecioVenta" />
+            </div>                                 
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <label for="fechaVencimiento">Fecha de Vencimiento: </label>
+                <InputDate id="fechaVencimiento" class="form-control" @bind-Value="alimento.FechaVencimiento" />
+                <ValidationMessage For="() => alimento.FechaVencimiento" />
+            </div>
+            <div class="col">
+                <label for="unidadMedida">Unidad de Medida: </label>
+                <InputSelect id="unidadMedida" class="form-select" @bind-Value="alimento.UnidadMedida">
+                    <option value="">Seleccione Unidad de Medida ...</option>
+                    <option value="Libras">Libras</option>
+                    <option value="Kilos">Kilos</option>
+                    <option value="Litros">Litros</option>
+                </InputSelect>
+                <ValidationMessage For="() => alimento.UnidadMedida" />
+            </div>
+        </div>       
+        <div class="row mt-3 text-center">
+            <div class="col">
+                <button class="btn btn-secondary" type="submit">Guardar</button>
+            </div>
+        </div>
+    </div>    
+
+</EditForm>
+
+
+<Laboratorio12.Componentes.ListadoAlimentos></Laboratorio12.Componentes.ListadoAlimentos>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    private Alimento alimento = new Alimento();
+    private List<Alimento> alimentos = new List<Alimento>();
+
+    private void Guardar()
+    {
+        alimentos.Add(alimento);
+        // Guardar la lista de alimentos en LocalStorage como JSON
+        localStorage.SetItem("archivo_alimentos", alimentos);
+        NavigationManager.NavigateTo("/listado-alimentos");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Recuperar la lista de starships desde LocalStorage a una variable var
+        var alimentosGuardados = localStorage.GetItem<List<Alimento>>("archivo_alimentos");
+
+        // Validar si la lista fue recuperada correctamente, copiarla a la lista
+        if (alimentosGuardados != null)
+        {
+            alimentos = alimentosGuardados;
+            if (id != null)
+            {
+                // Buscar el alimento por ID
+                alimento = alimentos.FirstOrDefault(a => a.Id == id);
+            }
+        }
+    }
+
+}

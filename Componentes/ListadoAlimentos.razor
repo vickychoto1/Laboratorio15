@@ -1,0 +1,61 @@
+﻿@inject HttpClient Http;
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject NavigationManager NavigationManager
+
+
+@if (alimentos == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Precio Compra</th>
+                <th>Fecha Vencimiento</th>
+                <th>Unidad de Medida</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var alimento in alimentos)
+            {
+                <tr>
+                    <td>@alimento.Id</td>
+                    <td>@alimento.Nombre</td>
+                    <td>@alimento.Descripcion</td>
+                    <td>@alimento.FechaVencimiento.ToShortDateString()</td>
+                    <td>@alimento.UnidadMedida</td>
+                    <td>
+                        <button class="btn btn-warning"
+                                @onclick="@(() => NavigationManager.NavigateTo($"alimento-editar/{alimento.Id}"))">
+                            Editar
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="@(() => NavigationManager.NavigateTo($"alimento-borrar/{alimento.Id}"))">
+                            Borrar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Alimento> alimentos = new List<Alimento>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var alimentosGuardados = localStorage.GetItem<List<Alimento>>("archivo_alimentos");
+
+        if (alimentosGuardados != null)
+        {
+            alimentos = alimentosGuardados;
+        }
+    }
+}

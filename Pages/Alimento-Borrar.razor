@@ -1,0 +1,29 @@
+﻿@page "/alimento-borrar/{id}"
+
+@using Models;
+@using Componentes;
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject NavigationManager NavigationManager
+
+<h3>Eliminando...</h3>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    protected override void OnInitialized()
+    {
+        var alimentos = localStorage.GetItem<List<Alimento>>("archivo_alimentos");
+        if (alimentos != null)
+        {
+            var alimento = alimentos.FirstOrDefault(a => a.Id == Id);
+            if (alimento != null)
+            {
+                alimentos.Remove(alimento);
+                localStorage.SetItem("archivo_alimentos", alimentos);
+            }
+        }
+        NavigationManager.NavigateTo("/listado-alimentos");
+    }
+
+}
